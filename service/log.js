@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { getCurrentDateTime } = require('./currentTime');
 
-const logDir = path.join(__dirname, '../log');
+const logDir = path.join(__dirname, '../logs');
 const logFilePath = path.join(logDir, 'application.log');
 
 // Ensure the log directory exists

@@ -16,8 +16,8 @@ const logFilePath = path.join(logDir, 'application.log');
 })();
 
 
-exports.writeLog = async (message) => {
-  fs.appendFile(logFilePath, `${getCurrentDateTime()} - ${message}\n`, (err) => {
+exports.writeLog = async (message, code='none') => {
+  fs.appendFile(logFilePath, `${getCurrentDateTime()},${code},${message}\n`, (err) => {
     if (err) {
       console.error('Error writing to log file:', err.message);
     }

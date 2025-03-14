@@ -1,3 +1,3 @@
 exports.getCurrentDateTime = () => {
-    return '['+ new Date().toISOString() +'] ';
+    return new Date().toISOString();
 };

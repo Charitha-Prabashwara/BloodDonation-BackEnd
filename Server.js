@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const PORT = parseInt(process.env.PORT || 8000);
 
 //const path = require('path')
 const cors = require("cors");
@@ -10,6 +11,8 @@ const morgan = require('morgan');
 const cookieParser = require("cookie-parser")
 
 require("./config/database");
+
+const userRouter = require('./routes/user.route');
 
 
 const allowedOrigins = [
@@ -47,8 +50,8 @@ app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 app.use(bodyParser.json({ limit: "10mb" }));
 
+app.use("/api/v1/user", userRouter);
 
-const PORT = parseInt(process.env.PORT || 8000);
 
 
 // Error handling

@@ -31,15 +31,18 @@
     "damsel-backend": "file:",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "http-status-codes": "^2.3.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.10.0",
     "mongoose": "^8.7.2",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
+    "nodemailer": "^6.10.0",
     "nodemon": "^3.1.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "uuid": "^11.0.4"
+    "uuid": "^11.0.4",
+    "validator": "^13.12.0"
   }
 }

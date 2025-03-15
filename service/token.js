@@ -9,13 +9,13 @@ exports.verifyJwt = async(token, secret) => {
         };
 
 
-exports.createVerifyJWT = async(payload, secret, tokenLifeTime)=>{
+exports.createJWT = async(payload, secret, tokenLifeTime)=>{
     return new Promise((resolve, reject)=>{
             jwt.sign(payload, secret, { expiresIn: tokenLifeTime }, (error, token)=>{
                 if(error){
-                    reject(error)
+                    return reject(error)
                 }else{
-                    resolve(token)
+                    return resolve(token)
                 }
             });
     });

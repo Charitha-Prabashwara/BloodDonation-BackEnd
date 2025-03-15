@@ -87,18 +87,17 @@ const user = new mongoose.Schema({
     password:{
         type:String,
         required:true,
-        select:false
     },
 
     access_token:{
         type:String,
         required:false,
-        select:false
+       
     },
     refresh_token:{
         type:String,
         required:false,
-        select:false
+        
     },
 
     name_with_initials:{

@@ -3,11 +3,12 @@ const express = require('express');
 const { default: mongoose } = require('mongoose');
 
 const validator = require('validator');
-const {sendVerifyEmail} = require('../service/emailService');
-const bcrypt = require('bcrypt');
-const jwt = require("jsonwebtoken");
+const {sendVerifyEmail, sendForgotPasswordEmail} = require('../service/emailService');
+
 const {successRes, errorRes} = require('../res/responseObject');
 const {verifyJwt,createJWT} = require('../service/token');
+const {salt, hash, compare} = require('../service/hashgen');
+
 
 
 exports.signUpUser = async (req, res) => {
@@ -27,10 +28,10 @@ exports.signUpUser = async (req, res) => {
         }
 
         // Generate salt
-        const salt = await bcrypt.genSalt(parseInt(process.env.SALT_ROUNDS));
+        const passwordSalt = await salt(parseInt(process.env.SALT_ROUNDS));
         
         // Generate hash password with salt
-        const hash = await bcrypt.hash(password, salt);
+        const passwordHash = await hash(password, passwordSalt);
 
         // Check if the user already exists
         const existingUser = await User.findOne({ email });
@@ -43,7 +44,7 @@ exports.signUpUser = async (req, res) => {
             first_name,
             last_name,
             email,
-            password: hash
+            password: passwordHash
         });
 
         const payload = { id: user._id.toString() };
@@ -106,12 +107,12 @@ exports.signInUser = async(req, res)=>{
             return errorRes(res, null, 'invalid password', 422);
         }
 
-        const user = await User.findOne({email:email, account_email_verified:true, account_verified:true});
+        const user = await User.findOne({email:email, account_email_verified:true, account_verified:true, account_status:'active'});
         if(!user){
             return errorRes(res, null, 'invalid email or password', 400);
         }
       
-       const result = await bcrypt.compare(password, user.password);
+       const result = await compare(password, user.password);
        if(!result){
         return errorRes(res, null, 'invalid email or password', 400);
        }
@@ -151,3 +152,90 @@ exports.signInUser = async(req, res)=>{
         return errorRes(res, error, error.stack, 500);
     }
 }
+
+exports.resetPasswordRequest = async(req, res)=>{
+    try{
+        const {email} = req.body;
+        if(!email){
+            return errorRes(res, null, 'required fields', 422); 
+        }
+
+        if(!validator.isEmail(email)){
+            return errorRes(res, null, 'invalid email address', 422); 
+        }
+
+        await User.findOne({email:email}).then(async(user)=>{
+            if(!user){
+                return errorRes(res, null, 'user not found', 404); 
+            }
+            const payload = {
+                id:user._id,
+                email:user.email
+            }
+
+            const token = await createJWT(payload, process.env.PASSWORD_REST_TOKEN_REFRESH_SECRET, process.env.PASSWORD_REST_LIFE_TIME);
+            sendForgotPasswordEmail(user.email, token);
+
+            return successRes(res, null, 'password reset request sent to email address', 200);
+        }).catch((error)=>{
+            return errorRes(res, error, error.message, 500); 
+        })
+
+
+
+    }catch(error){
+        return errorRes(res, error, error.message, 500); 
+    }
+}
+
+exports.resetPassword = async(req, res)=>{
+    try {
+        const {token, password, confirm_password} = req.body;
+
+        if(!token||!password||!confirm_password){
+            return errorRes(res, null, 'not found required fields.', 422); 
+        }
+    
+        if(!validator.isJWT(token)){
+            return errorRes(res, null, 'invalid request.', 422); 
+        }
+    
+        if(!validator.equals(password, confirm_password)){
+            return errorRes(res, null, 'password and confirm password not match', 422); 
+        }
+    
+        await verifyJwt(token, process.env.PASSWORD_REST_TOKEN_REFRESH_SECRET).then((payload)=>{
+    
+            User.findById(payload.id).then(async(user)=>{
+                if(!user){
+                    return errorRes(res, null, 'invalid request.', 422);
+                }
+                 // Generate salt
+                const passwordSalt = await salt(parseInt(process.env.SALT_ROUNDS));
+                
+                // Generate hash password with salt
+                const passwordHash = await hash(password, passwordSalt);
+                user.password = passwordHash;
+                
+                user.save().then(()=>{
+                    successRes(res, null, 'password reset successfully', 200);
+                }).catch((error)=>{
+                    return errorRes(res, error, error.message, 500);
+                })
+            }).catch((error)=>{
+                return errorRes(res, error, error.message, 500);
+            })
+        }).catch(()=>{
+            return errorRes(res, null, 'invalid request.', 422);
+        })
+    } catch (error) {
+        return errorRes(res, error, error.message, 500);
+    }
+
+   
+
+
+
+
+
+};

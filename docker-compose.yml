@@ -1,0 +1,17 @@
+
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: DockerFile
+    container_name: blood-donation-backend-dev  # Define a custom container name
+    ports:
+      - "8000:3000"  # Expose the Vite development server on port 3000
+    volumes:
+      - .:/app  # Mount the current directory to the container for live reloading
+    environment:
+      - NODE_ENV=development
+      - VITE_HOST=0.0.0.0
+    command: ["npm", "run", "dev"] # Start the Vite development server
+    tty: true  # Allocate a pseudo-TTY for the container

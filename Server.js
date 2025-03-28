@@ -13,7 +13,7 @@ const cookieParser = require("cookie-parser")
 require("./config/database");
 
 const userRouter = require('./routes/user.route');
-
+const testRouter = require('./routes/test.route')
 
 const allowedOrigins = [
   "http://localhost:3000"
@@ -51,6 +51,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use(bodyParser.json({ limit: "10mb" }));
 
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/test", testRouter);
 
 
 
@@ -60,7 +61,7 @@ app.use((err, req, res, next) => {
     res.status(500).send("Something went wrong!");
   });
   
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0',() => {
     console.log(`Server is listening on port ${PORT}.`);
   });
   

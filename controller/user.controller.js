@@ -232,10 +232,54 @@ exports.resetPassword = async(req, res)=>{
         return errorRes(res, error, error.message, 500);
     }
 
-   
-
-
-
-
-
 };
+
+/*
+ * find user by id(validate user is verified, verified by doctor, active, not blocked) 
+ * every user must available, verified, active, not blocked
+ * if user is verified by doctor, can;t update nic, 'name_with_initials', 'nic, 'full_name'
+ * if user is not verified by dictor, can update all fields.
+ * 
+ * 
+ * nic:-
+ *     [1], validate gender using nic,
+ *     [2], validate birthdate using nic,
+ *     [3], validate nic using nic
+ * 
+ * phone_number-
+ *     [1], validate phone number(all international standerds are allowed)
+ *     [2], validate phone number using phone number
+
+ * if req.user isn't available, return error(unauthorized access)
+ * all fields are not required.
+*/
+exports.userProfile = async(req, res)=>{
+    const {nic, first_name, last_name, phone_number, name_with_initials, full_name, address, } = req.body;
+    const user = req.user;
+
+    try{
+
+        //find user by id(validate user is verified, verified by doctor, active, not blocked) 
+        //every user must available, verified, active, not blocked
+
+        const user = await User.findById(req.user.id, {account_verified:true, account_email_verified:true, account_status:'active'});
+        if(!user){
+            return errorRes(res, null, 'unauthorized access', 401);
+        }
+
+        //if user is verified by doctor, can;t update nic, 'name_with_initials', 'nic, 'full_name'
+        //if user is not verified by dictor, can update all fields.
+        
+
+
+
+        
+
+    }catch(error){
+        return errorRes(res, error, error.message, 500);
+
+    }finally{
+        
+    }
+
+}

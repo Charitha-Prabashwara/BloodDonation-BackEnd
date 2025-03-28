@@ -133,28 +133,34 @@ const user = new mongoose.Schema({
             type:String,
             required:false,
         },
-        blood_group:{
-            type:String,
-            required:false,
-            enum:['A+','A-','B+','B-','AB+','AB-','O+','O-'],
-        },
-        last_blood_donated_date:{
-            type:Date,
-            required:false,
-        },
-        last_blood_donated_location:{
-            type:String,
-            required:false,
-        },
-        rest_period_days:{
-            type:Number,
-            required:false
-        },
-        is_donor_available:{
-            type:Boolean,
-            required:false,
-        },
+       
     },
+    blood_group:{
+        type:String,
+        required:false,
+        enum:['A+','A-','B+','B-','AB+','AB-','O+','O-'],
+    },
+    last_blood_donated_date:{
+        type:Date,
+        required:false,
+    },
+    last_blood_donated_location:{
+        type:String,
+        required:false,
+    },
+    rest_period_days:{
+        type:Number,
+        required:false
+    },
+    is_donor_available:{
+        type:Boolean,
+        required:false,
+    },
+    verified_by_doctor:{
+        type:Boolean,
+        required:false,
+        default:false,
+    }
 });
 
 const User = mongoose.model('User', user);

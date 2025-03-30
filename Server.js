@@ -15,19 +15,8 @@ require("./config/database");
 const userRouter = require('./routes/user.route');
 const testRouter = require('./routes/test.route')
 
-const allowedOrigins = [
-  "http://localhost:3000"
-];
-
-// CORS options
 const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: "http://localhost:3000", // Allow requests from React frontend
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   allowedHeaders: [
     "Origin",
@@ -35,11 +24,11 @@ const corsOptions = {
     "Content-Type",
     "Accept",
     "Authorization",
-    "authorization",
-    "X-Token" 
+    "X-Token",
   ],
-  credentials: true,
+  credentials: true, // Allow sending cookies
 };
+
 
 app.use(cors(corsOptions));
 
@@ -52,7 +41,6 @@ app.use(bodyParser.json({ limit: "10mb" }));
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/test", testRouter);
-
 
 
 // Error handling

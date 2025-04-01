@@ -8,7 +8,10 @@ const bodyParser = require("body-parser");
 const morgan = require('morgan');
 //const swaggerUi = require("swagger-ui-express");
 //const swaggerJsDoc = require("swagger-jsdoc");
-const cookieParser = require("cookie-parser")
+const cookieParser = require("cookie-parser");
+
+//const csrf = require('csurf');
+//const csrfProtection = csrf({ cookie: true });
 
 require("./config/database");
 
@@ -16,17 +19,19 @@ const userRouter = require('./routes/user.route');
 const testRouter = require('./routes/test.route')
 
 const corsOptions = {
-  origin: "http://localhost:3000", // Allow requests from React frontend
+  origin: 'http://localhost:3000',
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   allowedHeaders: [
-    "Origin",
-    "X-Requested-With",
-    "Content-Type",
-    "Accept",
-    "Authorization",
-    "X-Token",
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'X-CSRF-Token',
+        'Accept',
+        'Accept-Language',
+        'User-Agent',
+        'If-Modified-Since'
   ],
-  credentials: true, // Allow sending cookies
+  credentials: true
 };
 
 
@@ -39,8 +44,21 @@ app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 app.use(bodyParser.json({ limit: "10mb" }));
 
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
+
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/test", testRouter);
+
 
 
 // Error handling

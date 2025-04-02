@@ -114,7 +114,7 @@ exports.signInUser = async(req, res)=>{
       
        const result = await compare(password, user.password);
        if(!result){
-        return errorRes(res, null, 'invalid email or password', 400);
+        return errorRes(res, null, 'invalid email or password', 401);
        }
 
        const payload = {
@@ -122,6 +122,7 @@ exports.signInUser = async(req, res)=>{
             email: user.email,
             role:user.account_type
        }
+       
        const access_token = await createJWT(payload, process.env.USER_TOKEN_ACCESS_SECRET, process.env.USER_TOKEN_ACCESS_LIFE_TIME);
        const refresh_token = await createJWT(payload, process.env.USER_TOKEN_REFRESH_SECRET, process.env.USER_TOKEN_REFRESH_LIFE_TIME);
        
@@ -129,7 +130,14 @@ exports.signInUser = async(req, res)=>{
        user.refresh_token =refresh_token;
        user.save();
 
-       const responseObject = {
+       const response = {
+        user:{
+            _id:user._id,
+            email:user.email,
+            role:user.account_type,
+            first_name: user.first_name,
+            last_name: user.last_name
+        },
         access_token: access_token,
         refresh_token: refresh_token,
        }
@@ -137,16 +145,16 @@ exports.signInUser = async(req, res)=>{
        res.cookie('refreshToken', refresh_token,{
             httpOnly: true,
             secure: true,
-            sameSite: 'Lax',
+            sameSite: 'Strict',
             maxAge: 2592000000 // 30 days
         })
         .cookie('accessToken', access_token,{
             httpOnly: true,
             secure: true,
-            sameSite: 'Lax',
+            sameSite: 'Strict',
             maxAge:  3600000 // 1 hour
         },)
-       return successRes(res, responseObject, 'login successful', 200);
+       return successRes(res, response, 'login successful', 200);
 
     }catch(error){
         return errorRes(res, error, error.stack, 500);

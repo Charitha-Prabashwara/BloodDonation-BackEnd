@@ -138,8 +138,7 @@ exports.signInUser = async(req, res)=>{
             first_name: user.first_name,
             last_name: user.last_name
         },
-        access_token: access_token,
-        refresh_token: refresh_token,
+        access_token: access_token
        }
 
        res.cookie('refreshToken', refresh_token,{
@@ -148,12 +147,6 @@ exports.signInUser = async(req, res)=>{
             sameSite: 'Strict',
             maxAge: 2592000000 // 30 days
         })
-        .cookie('accessToken', access_token,{
-            httpOnly: true,
-            secure: true,
-            sameSite: 'Strict',
-            maxAge:  3600000 // 1 hour
-        },)
        return successRes(res, response, 'login successful', 200);
 
     }catch(error){
@@ -290,4 +283,8 @@ exports.userProfile = async(req, res)=>{
         
     }
 
+}
+
+exports.refreshAuth = async(req, res)=>{
+    
 }

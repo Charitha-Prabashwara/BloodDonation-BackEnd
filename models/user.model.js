@@ -5,21 +5,23 @@ const user = new mongoose.Schema({
     nic:{
         type:String,
         required:false,
-        unique:true,
         minlength:10,
         maxlength:12,
+        select:true
     },
     first_name:{
         type:String,
         required:true,
         minlength:3,
         maxlength:50,
+        select:true
     },
     last_name:{
         type:String,
         required:true,
         minlength:3,
         maxlength:50,
+        select:true
     },
     phone_number:{
         type:String,
@@ -27,6 +29,7 @@ const user = new mongoose.Schema({
         unique:true,
         minlength:10,
         maxlength:10,
+        select:true
     },
     email:{
         type:String,
@@ -34,12 +37,14 @@ const user = new mongoose.Schema({
         unique:true,
         minlength:3,
         maxlength:50,
+        select:true
     },
     account_type:{
         type:String,
         required:true,
         enum:['user','donor', 'doctor', 'assistant'],
         default:'user',
+        select:true
        
     },
     account_status:{
@@ -103,35 +108,44 @@ const user = new mongoose.Schema({
     name_with_initials:{
         type:String,
         required:false,
+        select:true
     },
     full_name:{
         type:String,
         required:false,
+        select:true
     },
     address:{
+        
         province:{
             type:String,
             required:false,
+            select:true
         },
         district:{
             type:String,
             required:false,
+            select:true
         },
         city:{
             type:String,
             required:false,
+            select:true
         },
         postal_code:{
             type:String,
             required:false,
+            select:true
         },
         address_line1:{
             type:String,
             required:false,
+            select:true
         },
         address_line2:{
             type:String,
             required:false,
+            select:true
         },
        
     },
@@ -160,6 +174,12 @@ const user = new mongoose.Schema({
         type:Boolean,
         required:false,
         default:false,
+    },
+    gender:{
+        type:String,
+        required:false,
+        enum:['male','female','other'],
+        select:true
     }
 });
 

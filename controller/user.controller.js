@@ -23,8 +23,20 @@ exports.signUpUser = async (req, res) => {
             return errorRes(res, null, 'Invalid email address', 422);
         }
 
+        if(first_name.length > 30){
+            return errorRes(res, null, 'First name length too long, max:30', 422);
+        }
+
+        if(last_name.length > 30){
+            return errorRes(res, null, 'Last name length too long, max:30', 422);
+        }
+
         if (!validator.equals(password, confirm_password)) {
             return errorRes(res, null, 'Passwords do not match', 422);
+        }
+
+        if(password.length < 6 || confirm_password.length < 6){
+            return errorRes(res, null, 'Password length is too small', 422);
         }
 
         // Generate salt
@@ -55,7 +67,7 @@ exports.signUpUser = async (req, res) => {
         await user.save();
         sendVerifyEmail(user.email, user.first_name, token);
 
-        return successRes(res, user, 'User created successfully', 201);
+        return successRes(res, user, 'User account created.', 201);
     } catch (error) {
         return errorRes(res, error, 'Error creating user', 500);
     }
@@ -64,7 +76,7 @@ exports.signUpUser = async (req, res) => {
 
 exports.verify = async (req, res) => {
     try {
-        const { token } = req.query;
+        const { token } = req.body;
 
         if (!token) {
             return errorRes(res, null, "Token not provided", 422);
@@ -138,7 +150,7 @@ exports.signInUser = async(req, res)=>{
             first_name: user.first_name,
             last_name: user.last_name
         },
-        access_token: access_token
+        accessToken: access_token
        }
 
        res.cookie('refreshToken', refresh_token,{
@@ -147,7 +159,7 @@ exports.signInUser = async(req, res)=>{
             sameSite: 'Strict',
             maxAge: 2592000000 // 30 days
         })
-       return successRes(res, response, 'login successful', 200);
+       return successRes(res, response, 'Login successful', 200);
 
     }catch(error){
         return errorRes(res, error, error.stack, 500);
@@ -198,7 +210,7 @@ exports.resetPassword = async(req, res)=>{
         }
     
         if(!validator.isJWT(token)){
-            return errorRes(res, null, 'invalid request.', 422); 
+            return errorRes(res, null, 'invalid request. rrrrr', 422); 
         }
     
         if(!validator.equals(password, confirm_password)){
@@ -206,10 +218,10 @@ exports.resetPassword = async(req, res)=>{
         }
     
         await verifyJwt(token, process.env.PASSWORD_REST_TOKEN_REFRESH_SECRET).then((payload)=>{
-    
+            console.log(payload)
             User.findById(payload.id).then(async(user)=>{
                 if(!user){
-                    return errorRes(res, null, 'invalid request.', 422);
+                    return errorRes(res, null, 'invalid request. eee', 422);
                 }
                  // Generate salt
                 const passwordSalt = await salt(parseInt(process.env.SALT_ROUNDS));
@@ -226,8 +238,8 @@ exports.resetPassword = async(req, res)=>{
             }).catch((error)=>{
                 return errorRes(res, error, error.message, 500);
             })
-        }).catch(()=>{
-            return errorRes(res, null, 'invalid request.', 422);
+        }).catch((error)=>{
+            return errorRes(res, null, error.message, 422);
         })
     } catch (error) {
         return errorRes(res, error, error.message, 500);
@@ -254,37 +266,121 @@ exports.resetPassword = async(req, res)=>{
  * if req.user isn't available, return error(unauthorized access)
  * all fields are not required.
 */
-exports.userProfile = async(req, res)=>{
-    const {nic, first_name, last_name, phone_number, name_with_initials, full_name, address, } = req.body;
-    const user = req.user;
-
+exports.getUserProfile = async(req, res)=>{
+   
+    const auth_user = req.user;
+    
     try{
+        //if(!auth_user){return errorRes(res, null, 'unauthorized access', 401)}
 
         //find user by id(validate user is verified, verified by doctor, active, not blocked) 
         //every user must available, verified, active, not blocked
+       
+        const user = await User.findById(auth_user.id, {account_verified:true, account_email_verified:true, account_status:'active'}).then((user)=>{
+           
 
-        const user = await User.findById(req.user.id, {account_verified:true, account_email_verified:true, account_status:'active'});
-        if(!user){
-            return errorRes(res, null, 'unauthorized access', 401);
-        }
-
-        //if user is verified by doctor, can;t update nic, 'name_with_initials', 'nic, 'full_name'
-        //if user is not verified by dictor, can update all fields.
-        
-
-
-
-        
+            
+        return successRes(res, {
+                first_name: user.first_name,
+                last_name: user.last_name,
+                full_name: user.full_name,
+                name_with_initials: user.name_with_initials,
+                nic: user.nic,
+                gender: user.gender,
+                phone_number:user.phone_number,
+                address: user.address
+                
+            }, null, 200);
+        }).catch((error)=>{
+            return errorRes(res, null, 'Can not find your records', 404)
+        });
 
     }catch(error){
         return errorRes(res, error, error.message, 500);
 
-    }finally{
-        
     }
 
 }
 
+exports.setUserProfile = async(req, res)=>{
+    const data = req.body;
+    const auth_user = req.user;
+
+    try {
+        User.findByIdAndUpdate(auth_user.id, {
+            
+            first_name:data.first_name,
+            last_name:data.last_name,
+            full_name:data.full_name,
+            name_with_initials:data.name_with_initials,
+            nic:data.nic,
+            phone_number:data.phone_number,
+            address:data.address,
+            gender:data.gender
+        },{
+            account_verified:true,
+            account_email_verified:true,
+            account_status:'active'
+        })
+
+        .then((user)=>{
+             return successRes(res, null, "User has been updated", 200);
+        })
+
+        .catch((error)=>{
+            return errorRes(res, error, error.stack, 500);
+        })
+    } catch (error) {
+        
+    }
+}
+
 exports.refreshAuth = async(req, res)=>{
+
+    try {
+      const userId = req.user.id;
+        
+      if(!userId){
+        errorRes(res, null, 'Unauthorized1', 400)
+      }
+
+      if(!mongoose.isValidObjectId(userId)){
+        errorRes(res, null, "Unauthorized2 ", 400)
+      }
+
+      //find verified active user
+      const user = await User.findById(userId, {account_verified:true, account_email_verified:true, account_status:'active'})
+
+      if(!user){
+         errorRes(res, null, "Unauthorized3 ", 400)
+      }
+
+      const payload = {
+            id:user._id,
+            email: user.email,
+            role:user.account_type
+       }
+     
+
+      const access_token = await createJWT(payload, process.env.USER_TOKEN_ACCESS_SECRET, process.env.USER_TOKEN_ACCESS_LIFE_TIME);
+      user.access_token =access_token;
+      user.save();
+      
+      const response = {
+        user:{
+            _id:user.id,
+            email:user.email,
+            role:user.account_type,
+            first_name: user.first_name,
+            last_name: user.last_name
+        },
+        accessToken: access_token
+       }
+      
+       successRes(res, response, null, 201);
+
+    } catch (error) {
+       errorRes(res, null, error.message, 500) 
+    }
     
 }

@@ -17,9 +17,10 @@ require("./config/database");
 
 const userRouter = require('./routes/user.route');
 const testRouter = require('./routes/test.route')
+const donationApplicationRouter = require('./routes/donationApplication.route');
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'http://192.168.56.1:3000/', 'http://192.168.1.101:3000/'],
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   allowedHeaders: [
         'Content-Type',
@@ -56,6 +57,7 @@ app.use((req, res, next) => {
 });
 
 
+app.use("/api/v1/application", donationApplicationRouter)
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/test", testRouter);
 

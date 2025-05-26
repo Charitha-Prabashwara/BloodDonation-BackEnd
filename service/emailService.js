@@ -17,7 +17,7 @@ function createTransporter() {
 
 exports.sendVerifyEmail = async(receiverAddress, first_name,verifyToken) =>{
 
-  // Create a transporter object using Gmail SMTP
+  // Create a transporter osbject using Gmail SMTP
   let transporter = createTransporter();
   await transporter.verify();
   
@@ -48,7 +48,7 @@ exports.sendVerifyEmail = async(receiverAddress, first_name,verifyToken) =>{
                     </tr>
                     <tr>
                         <td>
-                            <a href="http://localhost:8000/api/v1/user/verify?token=${verifyToken}" 
+                            <a href="http://localhost:3000/verify?token=${verifyToken}" 
                                style="display: inline-block; padding: 12px 20px; background-color: #007bff; color: #ffffff; text-decoration: none; font-size: 18px; border-radius: 5px;">
                                Verify Email
                             </a>
@@ -104,7 +104,7 @@ exports.sendForgotPasswordEmail = async(receiverAddress,resetToken) =>{
                 </tr>
                 <tr>
                     <td>
-                        <a href="http://localhost:8000/api/v1/user/reset-password?token=${resetToken}" 
+                        <a href="http://localhost:3000/password-reset?token=${resetToken}" 
                            style="display: inline-block; padding: 12px 20px; background-color: #007bff; color: #ffffff; text-decoration: none; font-size: 18px; border-radius: 5px;">
                            Reset Password
                         </a>

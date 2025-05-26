@@ -27,5 +27,5 @@ jobs:
    - name: Pull image from docker hub
      run: docker pull charitha124/express-js:latest
    - name: Run Docker Container
-     run: docker run -d -p 8000:8000 --name express-js-backend-container
+     run: docker run -d -p 8000:8000 --name express-js-container charitha124/express-js:latest
    

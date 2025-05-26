@@ -17,8 +17,7 @@ jobs:
       run: docker build -t charitha124/express-js .
     - name: Publish Image to docker hub
       run: docker push charitha124/express-js:latest
-
-      
+  
  deploy:
   needs: build
   runs-on: self-hosted

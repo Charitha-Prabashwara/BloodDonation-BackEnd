@@ -28,10 +28,25 @@ jobs:
      run: docker pull charitha124/express-js:latest
    - name: Run Docker Container
      run: |
-          docker rm -f express-js-container || true
-          docker run -d \
-            -p 8000:8000 \
-            --env-file .env \
-            --name express-js-container \
-            charitha124/express-js:latest
+      docker rm -f express-js-container || true
+      docker run -d \
+      -p 8000:8000 \
+      --name express-js-container \
+      -e APP_NAME=BloodDonation \
+      -e MONO_URI=${{ secrets.MONO_URI }} \
+      -e MONO_DB=${{ secrets.MONO_DB }} \
+      -e PORT=8000 \
+      -e SMTP_HOST=gmail \
+      -e SMTP_AUTH_USER=${{ secrets.SMTP_AUTH_USER }} \
+      -e SMTP_AUTH_PASSWORD=${{ secrets.SMTP_AUTH_PASSWORD }} \
+      -e SALT_ROUNDS=10 \
+      -e VERIFY_TOKEN_SECRET=${{ secrets.VERIFY_TOKEN_SECRET }} \
+      -e VERIFY_TOKEN_LIFE_TIME=1d \
+      -e USER_TOKEN_ACCESS_SECRET=${{ secrets.USER_TOKEN_ACCESS_SECRET }} \
+      -e USER_TOKEN_ACCESS_LIFE_TIME=1h \
+      -e USER_TOKEN_REFRESH_SECRET=${{ secrets.USER_TOKEN_REFRESH_SECRET }} \
+      -e USER_TOKEN_REFRESH_LIFE_TIME=30d \
+      -e PASSWORD_REST_TOKEN_REFRESH_SECRET=${{ secrets.PASSWORD_REST_TOKEN_REFRESH_SECRET }} \
+      -e PASSWORD_REST_LIFE_TIME=5m \
+      charitha124/express-js:latest
    

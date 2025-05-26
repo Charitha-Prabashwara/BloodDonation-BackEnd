@@ -105,7 +105,9 @@ exports.verify = async (req, res) => {
 
 exports.signInUser = async(req, res)=>{
     try{
+        
         const {email, password} = req.body;
+        
         
         if(!email || !password){
             return errorRes(res, null, 'missing required fields.', 422);
@@ -118,22 +120,27 @@ exports.signInUser = async(req, res)=>{
         if(validator.isEmpty(password)){
             return errorRes(res, null, 'invalid password', 422);
         }
+        
 
         const user = await User.findOne({email:email, account_email_verified:true, account_verified:true, account_status:'active'});
         if(!user){
             return errorRes(res, null, 'invalid email or password', 400);
         }
-      
+       
        const result = await compare(password, user.password);
+       
        if(!result){
         return errorRes(res, null, 'invalid email or password', 401);
        }
-
+        
        const payload = {
             id:user._id,
             email: user.email,
             role:user.account_type
        }
+
+       
+      
        
        const access_token = await createJWT(payload, process.env.USER_TOKEN_ACCESS_SECRET, process.env.USER_TOKEN_ACCESS_LIFE_TIME);
        const refresh_token = await createJWT(payload, process.env.USER_TOKEN_REFRESH_SECRET, process.env.USER_TOKEN_REFRESH_LIFE_TIME);

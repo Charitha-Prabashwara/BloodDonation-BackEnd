@@ -1,28 +1,47 @@
 name: Deploy ExpressJs backend
 
 on:
- push:
-  branches:
-   - Development
+  push:
+    branches:
+      - Development
 
 jobs:
- build:
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout Source
-      uses: actions/checkout@v4
-    - name: Login to docker hub
-      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-    - name: Build Docker Image
-      run: docker build -t charitha124/express-js .
-    - name: Publish Image to docker hub
-      run: docker push charitha124/express-js:latest
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
 
- deploy:
-  needs: build
-  runs-on: self-hosted
-  steps:
-   - name: Pull image from docker hub
-     run: docker pull charitha124/express-js:latest
-   - name: Run docker container
-     run: docker run -d -p 8000:8000 --name express-js-container charitha124/express-js:latest
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t charitha124/express-js:latest .
+          docker push charitha124/express-js:latest
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Pull Docker Image
+        run: docker pull charitha124/express-js:latest
+
+      - name: Stop and Remove Old Container (if exists)
+        run: |
+          docker stop express-js-container || true
+          docker rm express-js-container || true
+
+      - name: Run New Container
+        run: |
+          docker run -d \
+            --name express-js-container \
+            -p 8000:8000 \
+            --restart unless-stopped \
+            charitha124/express-js:latest

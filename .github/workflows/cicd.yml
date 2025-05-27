@@ -31,6 +31,7 @@ jobs:
      run: |
       docker rm -f express-js-container || true
       docker run -d \
+      --restart on-failure \
       -p 8000:8000 \
       --name express-js-container \
       -e APP_NAME=BloodDonation \

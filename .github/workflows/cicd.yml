@@ -13,6 +13,8 @@ jobs:
       uses: actions/checkout@v4
     - name: Login to docker hub
       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+    - name: Cleanup unused build images
+      run: docker image prune -f --filter "until=1h"
     - name: Build Docker Image
       run: docker build -t charitha124/express-js .
     - name: Publish Image to docker hub
@@ -23,6 +25,8 @@ jobs:
   needs: build
   runs-on: self-hosted
   steps:
+   - name: Clean up unused Docker objects
+     run: docker system prune -f --all --volumes
    - name: Login to docker hub
      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
    - name: Pull image from docker hub
@@ -51,4 +55,8 @@ jobs:
       -e PASSWORD_REST_TOKEN_REFRESH_SECRET=${{ secrets.PASSWORD_REST_TOKEN_REFRESH_SECRET }} \
       -e PASSWORD_REST_LIFE_TIME=5m \
       charitha124/express-js:latest
+   - name: Clean up after deployment
+     run: |
+      docker image prune -f
+      docker builder prune -f
    

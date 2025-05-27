@@ -17,8 +17,7 @@ jobs:
       run: docker build -t charitha124/express-js .
     - name: Publish Image to docker hub
       run: docker push charitha124/express-js:latest
-
-      
+  
  deploy:
   needs: build
   runs-on: self-hosted
@@ -31,6 +30,7 @@ jobs:
      run: |
       docker rm -f express-js-container || true
       docker run -d \
+      --restart on-failure:10
       -p 8000:8000 \
       --name express-js-container \
       -e APP_NAME=BloodDonation \

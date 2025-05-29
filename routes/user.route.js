@@ -16,5 +16,5 @@ userRouter.post('/verify', userController.verify)
 userRouter.get('/profile', (req, res, next) => new Auth(['user', 'doctor'], false, false).authenticate(req, res, next), userController.getUserProfile);
 userRouter.put('/profile', (req, res, next) => new Auth(['user', 'doctor'], false, false).authenticate(req, res, next), userController.setUserProfile);
 
-userRouter.put('/logout', (req, res, next) => new Auth(['user', 'doctor'], false, false).authenticate(req, res, next), userController.logout);
+userRouter.post('/logout', (req, res, next) => new Auth(['user', 'doctor'], false, false).authenticate(req, res, next), userController.logout);
 module.exports = userRouter;

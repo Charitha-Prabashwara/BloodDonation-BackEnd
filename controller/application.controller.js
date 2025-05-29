@@ -14,22 +14,33 @@ const donationApplication = require('../models/donationApplication.model');
 exports.getAllDonationApplication = async(req,res)=>{
     try {
         const authUser = req.user;
+        const {state}  = req.query;
 
-        donationApplication.find()
+        if(!state)
+            return errorRes(res, null, 'application state not defined', 422)
+        
+        donationApplication.find({
+            applicationState:state
+        }).populate({
+            path:'user',
+            select: '-password -account_activation_email -account_type -account_status -account_verified -account_email_verified -verified_by_doctor -access_token -refresh_token -__v'
+
+
+        })
         .then((applications)=>{
             if(!applications || applications.length===0){
-                errorRes(res, null, 'not found any application', 404)
+                return errorRes(res, null, 'not found any application', 404)
             }
-            successRes(res, applications, null, 200);
+            return successRes(res, applications, null, 200);
         })
         .catch((error)=>{
-            errorRes(res, null, error.message, 500);
+            return errorRes(res, null, error.message, 500);
         })
 
     
         
     } catch (error) {
-        errorRes(res, null, error.message, 500);
+        return errorRes(res, null, error.message, 500);
     }
 }
 

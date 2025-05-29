@@ -384,3 +384,8 @@ exports.refreshAuth = async(req, res)=>{
     }
     
 }
+
+exports.logout = async(req,res)=>{
+    const authUser = req.auth;
+    
+}

@@ -22,10 +22,7 @@ const donationApplicationRouter = require('./routes/donationApplication.route');
 
 const corsOptions = {
   origin: [
-    'http://localhost',
-    'https://localhost',
-    'http://ec2-54-226-190-150.compute-1.amazonaws.com',
-    'https://ec2-54-226-190-150.compute-1.amazonaws.com'
+    process.env.PROTOCOL + '://' + process.env.APPLICATION_DOMAIN,
   ],
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   allowedHeaders: [

@@ -69,7 +69,7 @@ exports.signUpUser = async (req, res) => {
 
         return successRes(res, user, 'User account created.', 201);
     } catch (error) {
-        return errorRes(res, error, 'Error creating user', 500);
+        return errorRes(res, error, error.message, 500);
     }
 };
 

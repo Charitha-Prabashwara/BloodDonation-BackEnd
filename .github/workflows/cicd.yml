@@ -53,6 +53,8 @@ jobs:
       -e USER_TOKEN_REFRESH_SECRET=${{ secrets.USER_TOKEN_REFRESH_SECRET }} \
       -e USER_TOKEN_REFRESH_LIFE_TIME=30d \
       -e PASSWORD_REST_TOKEN_REFRESH_SECRET=${{ secrets.PASSWORD_REST_TOKEN_REFRESH_SECRET }} \
+      -e APPLICATION_DOMAIN=${{ secrets.APPLICATION_DOMAIN }} \
+      -e PROTOCOL=${{ secrets.PROTOCOL }} \
       -e PASSWORD_REST_LIFE_TIME=5m \
       charitha124/express-js:latest
    - name: Clean up after deployment

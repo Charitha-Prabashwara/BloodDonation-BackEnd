@@ -19,7 +19,7 @@ require("./config/database");
 const userRouter = require('./routes/user.route');
 const testRouter = require('./routes/test.route')
 const donationApplicationRouter = require('./routes/donationApplication.route');
-
+console.log(process.env.PROTOCOL + '://' + process.env.APPLICATION_DOMAIN)
 const corsOptions = {
   origin: [
     process.env.PROTOCOL + '://' + process.env.APPLICATION_DOMAIN,

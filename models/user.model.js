@@ -27,6 +27,7 @@ const user = new mongoose.Schema({
         type:String,
         required:false,
         unique:true,
+        sparse: true,
         minlength:10,
         maxlength:10,
         select:true

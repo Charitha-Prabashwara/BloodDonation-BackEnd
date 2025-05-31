@@ -48,7 +48,7 @@ exports.sendVerifyEmail = async(receiverAddress, first_name,verifyToken) =>{
                     </tr>
                     <tr>
                         <td>
-                            <a href="http://localhost:3000/verify?token=${verifyToken}" 
+                            <a href="${process.env.PROTOCOL + '://' + process.env.APPLICATION_DOMAIN}/verify?token=${verifyToken}" 
                                style="display: inline-block; padding: 12px 20px; background-color: #007bff; color: #ffffff; text-decoration: none; font-size: 18px; border-radius: 5px;">
                                Verify Email
                             </a>
@@ -104,7 +104,7 @@ exports.sendForgotPasswordEmail = async(receiverAddress,resetToken) =>{
                 </tr>
                 <tr>
                     <td>
-                        <a href="http://localhost:3000/password-reset?token=${resetToken}" 
+                        <a href="${process.env.PROTOCOL + '://' + process.env.APPLICATION_DOMAIN}/password-reset?token=${resetToken}" 
                            style="display: inline-block; padding: 12px 20px; background-color: #007bff; color: #ffffff; text-decoration: none; font-size: 18px; border-radius: 5px;">
                            Reset Password
                         </a>

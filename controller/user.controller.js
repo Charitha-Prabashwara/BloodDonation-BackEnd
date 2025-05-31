@@ -9,8 +9,6 @@ const {successRes, errorRes} = require('../res/responseObject');
 const {verifyJwt,createJWT} = require('../service/token');
 const {salt, hash, compare} = require('../service/hashgen');
 
-
-
 exports.signUpUser = async (req, res) => {
     try {
         const { first_name, last_name, email, password, confirm_password } = req.body;

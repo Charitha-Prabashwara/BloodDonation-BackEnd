@@ -12,8 +12,5 @@ donationApplicationRouter.get('/all',  donationApplicationController.getAllDonat
 donationApplicationRouter.post('/create', (req, res, next) => new Auth(['user', 'doctor'], false, false).authenticate(req, res, next), donationApplicationController.createDonationApplication)
 donationApplicationRouter.get('/getSpecific', (req, res, next) => new Auth(['user', 'doctor'], false, false).authenticate(req, res, next), donationApplicationController.getDonationApplicationByUser);
 
-
-
-
-
+donationApplicationRouter.put('/id/:id', donationApplicationController.updateDonationApplicationById);
 module.exports = donationApplicationRouter;

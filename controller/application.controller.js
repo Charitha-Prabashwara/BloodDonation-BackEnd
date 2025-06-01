@@ -28,9 +28,9 @@ exports.getAllDonationApplication = async(req,res)=>{
 
         })
         .then((applications)=>{
-            if(!applications || applications.length===0){
-                return errorRes(res, null, 'not found any application', 404)
-            }
+            // if(!applications || applications.length===0){
+            //     return errorRes(res, null, 'not found any application', 404)
+            // }
             return successRes(res, applications, null, 200);
         })
         .catch((error)=>{
@@ -168,11 +168,48 @@ exports.createDonationApplication = async(req,res)=>{
 }
 
 
-exports.updateDonationApplication = (req,res)=>{
+exports.updateDonationApplicationById = async(req,res)=>{
     try {
+        const authUser = req.user;
+        const id =req.params.id;
+        const {applicationState} = req.body;
+
+        console.log(id)
+
+        if(!id){
+            return errorRes(res, null, 'application id not provided', 422)
+        }
+        if(!mongoose.isValidObjectId(id)){
+           return errorRes(res, null, 'application id not valid', 422)
+        }
+
+        const application_state_types =['pass', 'rejected']
+        if(applicationState && !application_state_types.includes(applicationState)){
+            return errorRes(res, null, 'invalid application State', 422)
+        }
+        const application = await donationApplication.findById(id).populate({
+            path:'user',
+            select: '-password -account_activation_email +account_type -account_status -account_verified -account_email_verified -verified_by_doctor -access_token -refresh_token -__v'
+        });
+        if(!application || application.length===0){
+             return errorRes(res, null, 'Not found application', 404)
+        }
+
+        application.applicationState = applicationState;
+        const saved_application = await application.save()
+        if(!saved_application){
+            return errorRes(res, null, 'Application not saved', 500)
+        }
+
+        console.log(saved_application)
+        //const user = User.findById()
+      
+         return successRes(res, saved_application, `Application ${(applicationState == 'pass')? 'Passed': 'Rejected'} Successfully.`, 200)
+   
         
+       
     } catch (error) {
-        
+         return errorRes(res, null, error.message, 500)
     }
 }
 

@@ -18,11 +18,15 @@ require("./config/database");
 
 const userRouter = require('./routes/user.route');
 const testRouter = require('./routes/test.route')
+const donorRouter = require('./routes/donor.route')
 const donationApplicationRouter = require('./routes/donationApplication.route');
+const campRouter = require('./routes/camp.route');
+const donationRouter = require('./routes/donation.route');
 console.log(process.env.PROTOCOL + '://' + process.env.APPLICATION_DOMAIN)
 const corsOptions = {
   origin: [
     process.env.PROTOCOL + '://' + process.env.APPLICATION_DOMAIN,
+
   ],
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   allowedHeaders: [
@@ -63,7 +67,9 @@ app.use((req, res, next) => {
 app.use("/api/v1/application", donationApplicationRouter)
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/test", testRouter);
-
+app.use("/api/v1/donor", donorRouter);
+app.use("/api/v1/camp", campRouter);
+app.use("/api/v1/donation", donationRouter);
 
 
 // Error handling

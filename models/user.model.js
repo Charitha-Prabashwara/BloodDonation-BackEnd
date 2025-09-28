@@ -43,7 +43,7 @@ const user = new mongoose.Schema({
     account_type:{
         type:String,
         required:true,
-        enum:['user','donor', 'doctor', 'assistant'],
+        enum:['user','donor', 'doctor', 'assistant', 'admin'],
         default:'user',
         select:true
        
@@ -182,6 +182,8 @@ const user = new mongoose.Schema({
         enum:['male','female','other'],
         select:true
     }
+},{
+    timestamps: true
 });
 
 const User = mongoose.model('User', user);

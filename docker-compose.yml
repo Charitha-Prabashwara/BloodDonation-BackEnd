@@ -1,46 +1,61 @@
-
+version: "3.8"
 
 services:
+
+  mongo_db:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=adminpassword
+      - MONGO_INITDB_DATABASE=Blood_donation    
+
+    container_name: blood-donation-database
+    restart: always
+    volumes:
+      - mongo_db:/data/db
+
+    ports:
+      - "27017:27017"
+
   backend:
     build:
       context: .
       dockerfile: DockerFile
-    container_name: blood-donation-backend-dev  # Define a custom container name
+    depends_on:
+      - mongo_db
+      #mongodb:
+        #condition: service_healthy
+    container_name: blood-donation-backend-dev
     ports:
-      - "8000:8000"  # Expose the Vite development server on port 3000
+      - "8000:8000"
     environment:
-      - APP_NAME=BloodDonation
-      - MONO_URI=mongodb+srv://seudev:UQ9Ev9rHJxsg5ZS0@developmentcluster.5cw5h.mongodb.net/
-      - MONO_DB=Blood_donation
-      - PORT=8000
-      - SMTP_HOST=gmail
-      - SMTP_PORT=
-      - SMTP_AUTH_USER=zed.zero.fun@gmail.com
-      - SMTP_AUTH_PASSWORD=ppxmakvuzvhjoeaa
-      - SALT_ROUNDS=10
-      - VERIFY_TOKEN_SECRET=fjsfjfjfjsdfjfj8ru38ru8rfhfdufuhf2ui3fh2f983yr2h828r2hr
-      - VERIFY_TOKEN_LIFE_TIME=1d
-      - USER_TOKEN_ACCESS_SECRET=fjsfjfjfjsdfjfj8ru38ru8rfhfdufuhf2ui3fh2f983yr2h828r2hr
-      - USER_TOKEN_ACCESS_LIFE_TIME=1h
-      - USER_TOKEN_REFRESH_SECRET=fjsfjfjfjsdfjfj8ru38ru8rfhfdufuhf2ui3fh2f983yr2h828r2hr
-      - USER_TOKEN_REFRESH_LIFE_TIME=30d
-      - PASSWORD_REST_TOKEN_REFRESH_SECRET=fjsfjfjfjsdfjfj8ru38ru8rfhfdufuhf2ui3fh2f983yr2h828r2hr
-      - PASSWORD_REST_LIFE_TIME=5m
-      - APPLICATION=local
-      - APPLICATION_DOMAIN=localhost
-      - PROTOCOL=http
-    command: ["npm", "run", "dev"] # Start the Vite development server
-    tty: true  # Allocate a pseudo-TTY for the container
-    networks:
-      - blood-link
+      APP_NAME: BloodDonation
+      MONO_URI: mongodb://mongo_db:27017/
+      MONGO_DB: Blood_donation
+      PORT: 8000
+      SMTP_HOST: gmail
+      SMTP_PORT: 456
+      SMTP_AUTH_USER: zed.zero.fun@gmail.com
+      SMTP_AUTH_PASSWORD: ppxmakvuzvhjoeaa
+      SALT_ROUNDS: 10
+      VERIFY_TOKEN_SECRET: fjsfjfjfjsdfjfj8ru38ru8rfhfdufuhf2ui3fh2f983yr2h828r2hr
+      VERIFY_TOKEN_LIFE_TIME: 1d
+      USER_TOKEN_ACCESS_SECRET: fjsfjfjfjsdfjfj8ru38ru8rfhfdufuhf2ui3fh2f983yr2h828r2hr
+      USER_TOKEN_ACCESS_LIFE_TIME: 1h
+      USER_TOKEN_REFRESH_SECRET: fjsfjfjfjsdfjfj8ru38ru8rfhfdufuhf2ui3fh2f983yr2h828r2hr
+      USER_TOKEN_REFRESH_LIFE_TIME: 30d
+      PASSWORD_REST_TOKEN_REFRESH_SECRET: fjsfjfjfjsdfjfj8ru38ru8rfhfdufuhf2ui3fh2f983yr2h828r2hr
+      PASSWORD_REST_LIFE_TIME: 5m
+      APPLICATION: local
+      APPLICATION_DOMAIN: localhost
+      PROTOCOL: http
+    #command: ["npm", "run", "dev"]
+    tty: true
     volumes:
       - shared-data:/shared
-  
-networks:
-  blood-link:
-    driver: bridge
+
 
 volumes:
-  shared-data:
-    driver: local
-    
+  shared-data: {}
+  mongo_db: {}
+  

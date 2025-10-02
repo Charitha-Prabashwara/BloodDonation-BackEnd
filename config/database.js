@@ -15,7 +15,7 @@ const errorCode = 'database';
 
 var isConnectedBefore = false;
   const connect = () => {
-    mongoose.connect((process.env.MONO_URI+process.env.MONO_DB), { useNewUrlParser: true, useUnifiedTopology: true})
+    mongoose.connect((process.env.MONO_URI + process.env.MONGO_DB), { useNewUrlParser: true, useUnifiedTopology: true})
   }
 
 connect();

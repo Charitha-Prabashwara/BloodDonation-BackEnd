@@ -4,19 +4,35 @@ services:
 
   mongo_db:
     image: mongo
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=adminpassword
-      - MONGO_INITDB_DATABASE=Blood_donation    
+    #environment:
+    #  - MONGO_INITDB_ROOT_USERNAME=admin
+    #  - MONGO_INITDB_ROOT_PASSWORD=adminpassword
+    #  - MONGO_INITDB_DATABASE=Blood_donation    
 
     container_name: blood-donation-database
     restart: always
+    networks:
+      - blood-link
     volumes:
       - mongo_db:/data/db
 
+    expose:
+      - "27017"
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-ui
+    depends_on:
+      - mongo_db
+    restart: always
     ports:
-      - "27017:27017"
-
+      - 8081:8081
+    networks:
+      - blood-link
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo_db:27017
+      ME_CONFIG_BASICAUTH: "true"
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
   backend:
     build:
       context: .
@@ -26,8 +42,11 @@ services:
       #mongodb:
         #condition: service_healthy
     container_name: blood-donation-backend-dev
-    ports:
-      - "8000:8000"
+    networks:
+      - blood-link
+    restart: always
+    expose:
+      - "8000"
     environment:
       APP_NAME: BloodDonation
       MONO_URI: mongodb://mongo_db:27017/
@@ -48,14 +67,39 @@ services:
       PASSWORD_REST_LIFE_TIME: 5m
       APPLICATION: local
       APPLICATION_DOMAIN: localhost
-      PROTOCOL: http
-    #command: ["npm", "run", "dev"]
+      PROTOCOL: https
+    command: ["npm", "run", "dev"]
     tty: true
     volumes:
       - shared-data:/shared
+  
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    ports:
+       - "80:80"
+       - "443:443"
+    restart: always
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    command: ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
+    networks:
+      - blood-link
+    depends_on:
+      - mongo_db
+      - backend
 
 
 volumes:
+  caddy_data: {}
+  caddy_config: {}
   shared-data: {}
   mongo_db: {}
   
+networks:
+  blood-link:
+    external: true
